@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ $# -ge 1 ]; then
+  branch="$1"
+else
+  echo "git-show-new requires a branch name"
+  exit 1
+fi

@@ -9,4 +9,4 @@ fi
 
 printf "\n%s%s\n\n" $(git rev-list $branch@{1}..$branch | wc -l) \
   " commits were added by your last update to $branch:"
-git --no-pager log "$branch"@{1}.."$branch" --oneline
+git --no-pager log ""$(git --exec-path)/git-sh-setup"$branch"@{1}.."$branch" --oneline

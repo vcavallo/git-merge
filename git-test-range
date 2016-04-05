@@ -1,0 +1,35 @@
+#!/bin/bash
+
+test_rev() {
+  local rev="$1"
+  local command="$2"
+  git checkout -q "$rev" &&    # suppress feedback with -q
+    eval "$command"            # don't run comand unless checkout successful
+  local retcode=$?             # check exit code of last command run
+  if [ $retcode -ne 0 ]        # not an ok exit code (non-zero)
+  then
+    printf "\n%s\n" "$command FAILED ON:"
+    git --no-pager log -l -decorate $rev
+    return $retcode            # retun the same exit code as command.
+  fi
+}
+
+# head=$(git symbolic-ref HEAD 2>/dev/null || git rev-parse HEAD)
+# $range is defined as a commit range...
+
+fail_count=0
+for rev in $(git rev-list --reverse $range); do
+  test_rev $rev "$command"
+  retcode=$?
+  if [ $retcode -eq 0 ]; then   # ok. test next commit
+    continue
+  fi
+  if [ $keep_going ]; then      # keep going if that option was set
+    fail_count=$((fail_count + 1))
+    continue
+  else
+    git checkout -fq ${head#refs/heads/} # get back to where we started. strip out 'refs/heads' part
+    exit $retcode
+  fi
+done
+git checkout -fq ${head#refs/heads/}     # get back to where we started when loop is over

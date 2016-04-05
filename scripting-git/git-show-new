@@ -6,3 +6,7 @@ else
   echo "git-show-new requires a branch name"
   exit 1
 fi
+
+printf "\n%s%s\n\n" $(git rev-list $branch@{1}..$branch | wc -l) \
+  " commits were added by your last update to $branch:"
+git --no-pager log "$branch"@{1}.."$branch" --oneline
